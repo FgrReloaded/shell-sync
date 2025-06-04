@@ -1,6 +1,7 @@
 .turbo
 shellsync/node_modules
-shellsync/apps/native/.env
+shellsync/.env
+shellsync/android
 shellsync-server/.env
 shellsync-server/venv
 

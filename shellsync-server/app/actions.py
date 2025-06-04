@@ -124,7 +124,6 @@ def get_screen_lock_status():
             ],
             capture_output=True, text=True, check=True
         )
-        # Output is typically like "(true,)" or "(false,)"
         output = result.stdout.strip()
         if "true" in output:
             return {"success": True, "locked": True, "message": "Screen is locked."}
@@ -133,7 +132,6 @@ def get_screen_lock_status():
         else:
             return {"success": False, "message": f"Unexpected output from gdbus: {output}"}
     except subprocess.CalledProcessError as e:
-        # Check if it's because the screensaver service is not running
         if "org.gnome.ScreenSaver" in e.stderr and ("does not exist" in e.stderr or "was not provided" in e.stderr):
              return {"success": True, "locked": False, "message": "Screensaver service not active (screen likely not locked or service unavailable)."}
         return {"success": False, "message": f"Failed to get screen lock status: {e.stderr}"}
