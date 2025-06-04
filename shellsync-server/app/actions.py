@@ -6,10 +6,17 @@ from datetime import datetime
 
 def lock_screen():
     try:
-        subprocess.run(["loginctl", "unlock-session"], check=True)
+        subprocess.run(["loginctl", "lock-session"], check=True)
         return {"success": True, "message": "Screen locked successfully"}
     except subprocess.CalledProcessError:
         return {"success": False, "message": "Failed to lock screen"}
+
+def unlock_screen():
+    try:
+        subprocess.run(["loginctl", "unlock-session"], check=True)
+        return {"success": True, "message": "Screen unlocked successfully"}
+    except subprocess.CalledProcessError:
+        return {"success": False, "message": "Failed to unlock screen"}
 
 def list_apps():
     try:
@@ -105,5 +112,34 @@ def open_application(app_name):
         return {"success": False, "message": f"Application '{app_name}' not found"}
     except Exception as e:
         return {"success": False, "message": str(e)}
+
+def get_screen_lock_status():
+    try:
+        result = subprocess.run(
+            [
+                "gdbus", "call", "--session",
+                "--dest", "org.gnome.ScreenSaver",
+                "--object-path", "/org/gnome/ScreenSaver",
+                "--method", "org.gnome.ScreenSaver.GetActive"
+            ],
+            capture_output=True, text=True, check=True
+        )
+        # Output is typically like "(true,)" or "(false,)"
+        output = result.stdout.strip()
+        if "true" in output:
+            return {"success": True, "locked": True, "message": "Screen is locked."}
+        elif "false" in output:
+            return {"success": True, "locked": False, "message": "Screen is not locked."}
+        else:
+            return {"success": False, "message": f"Unexpected output from gdbus: {output}"}
+    except subprocess.CalledProcessError as e:
+        # Check if it's because the screensaver service is not running
+        if "org.gnome.ScreenSaver" in e.stderr and ("does not exist" in e.stderr or "was not provided" in e.stderr):
+             return {"success": True, "locked": False, "message": "Screensaver service not active (screen likely not locked or service unavailable)."}
+        return {"success": False, "message": f"Failed to get screen lock status: {e.stderr}"}
+    except FileNotFoundError:
+        return {"success": False, "message": "gdbus command not found. Is it installed and in PATH?"}
+    except Exception as e:
+        return {"success": False, "message": f"An unexpected error occurred: {str(e)}"}
 
 

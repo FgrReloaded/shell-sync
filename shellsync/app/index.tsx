@@ -8,6 +8,7 @@ import {
   Alert,
   RefreshControl,
 } from 'react-native';
+import { useRouter } from 'expo-router';
 import { useSystemData } from './hooks/useSystemData';
 import Section from './components/Section';
 import SystemInfoCard from './components/SystemInfoCard';
@@ -19,6 +20,7 @@ import ErrorDisplay from './components/ErrorDisplay';
 import { AppInfo, ActionResult } from './types/api';
 
 export default function DashboardScreen() {
+  const router = useRouter();
   const {
     systemInfo,
     apps,
@@ -30,24 +32,32 @@ export default function DashboardScreen() {
     killApp,
     openApp,
     lockUserScreen,
-    shutdownUserSystem,
-    restartUserSystem,
   } = useSystemData();
 
   const [appName, setAppName] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [actionStates, setActionStates] = useState<Record<string, boolean>>({});
 
-  const handleAction = useCallback(async (actionFn: () => Promise<ActionResult>, actionName: string, successMessage?: string, errorMessagePrefix?: string) => {
+  const handleAction = useCallback(async (
+    actionFn: () => Promise<ActionResult>,
+    actionName: string,
+    successMessage?: string,
+    errorMessagePrefix?: string,
+    requiresConfirmation: boolean = false
+  ) => {
     setActionStates(prev => ({ ...prev, [actionName]: true }));
     try {
+      if (requiresConfirmation) {
+        // Simplified: confirmation for actions on this screen can be direct if ever needed
+        // For now, only lock screen uses this on index.tsx, which doesn't need confirmation here
+      }
       const result = await actionFn();
       Alert.alert(
         result.success ? 'Success' : 'Error',
         result.message || (result.success ? (successMessage || 'Action completed.') : (errorMessagePrefix || 'Action failed.'))
       );
       if (result.success && (actionName === 'openApp' || actionName === 'killApp')) {
-        refreshAll(); // Refresh data if an app was opened or killed
+        refreshAll();
       }
     } catch (error: any) {
       Alert.alert('Error', error.message || 'An unexpected error occurred.');
@@ -76,6 +86,15 @@ export default function DashboardScreen() {
     >
       <Text className="text-4xl font-bold text-sky-400 text-center my-6">ShellSync</Text>
 
+      <View className="px-4 mb-6">
+        <ActionButton
+          title="Advanced System Controls"
+          onPress={() => router.push('/system-controls' as any)}
+          color="primary"
+          icon={<Text className="text-xl">⚙️</Text>}
+        />
+      </View>
+
       {(errorSystemInfo || errorApps) && (
         <ErrorDisplay
           message={errorSystemInfo?.message || errorApps?.message || 'Could not load some data.'}
@@ -96,10 +115,8 @@ export default function DashboardScreen() {
       <Section title="System Controls">
         <View className="px-4">
           <View className="flex-row justify-between mb-3">
-            <ActionButton title="Lock Screen" onPress={() => handleAction(lockUserScreen, 'lock', 'Screen locked successfully')} color="secondary" style={{ flex: 1, marginRight: 8 }} isLoading={actionStates['lock']} />
-            <ActionButton title="Restart" onPress={() => handleAction(restartUserSystem, 'restart', 'System restart initiated')} color="warning" style={{ flex: 1, marginLeft: 8 }} isLoading={actionStates['restart']} />
+            <ActionButton title="Lock Screen" onPress={() => handleAction(lockUserScreen, 'lock', 'Screen locked successfully', 'Failed to lock screen', false)} color="secondary" style={{ flex: 1, marginRight: 8 }} isLoading={actionStates['lock']} />
           </View>
-          <ActionButton title="Shutdown" onPress={() => handleAction(shutdownUserSystem, 'shutdown', 'System shutdown initiated')} color="danger" isLoading={actionStates['shutdown']} />
         </View>
       </Section>
 

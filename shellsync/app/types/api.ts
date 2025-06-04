@@ -66,3 +66,7 @@ export interface KillProcessPayload {
 export interface OpenAppPayload {
   app_name: string;
 }
+
+export interface ScreenLockStatusResponse extends ActionResult {
+  locked?: boolean; // Will be true if screen is locked, false if not, undefined on error from backend before check
+}

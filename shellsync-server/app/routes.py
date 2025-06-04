@@ -1,7 +1,9 @@
 from flask import Blueprint, jsonify, request
 from .actions import (
     lock_screen, list_apps, get_system_info,
-    shutdown_system, restart_system, kill_process, open_application
+    shutdown_system, restart_system, kill_process, open_application,
+    get_screen_lock_status,
+    unlock_screen
 )
 
 main = Blueprint('main', __name__)
@@ -17,6 +19,11 @@ def health_check():
 @main.route("/lock", methods=["POST"])
 def lock():
     result = lock_screen()
+    return jsonify(result)
+
+@main.route("/unlock", methods=["POST"])
+def unlock():
+    result = unlock_screen()
     return jsonify(result)
 
 @main.route("/apps")
@@ -63,4 +70,9 @@ def open_app():
         return jsonify({"success": False, "message": "App name is required"}), 400
 
     result = open_application(app_name)
+    return jsonify(result)
+
+@main.route("/screen-status", methods=["GET"])
+def screen_status():
+    result = get_screen_lock_status()
     return jsonify(result)

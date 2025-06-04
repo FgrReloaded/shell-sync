@@ -6,6 +6,7 @@ import {
   SystemInfoResponse,
   KillProcessPayload,
   OpenAppPayload,
+  ScreenLockStatusResponse,
 } from '../types/api';
 
 const request = async <T>(endpoint: string, options?: RequestInit): Promise<T> => {
@@ -15,7 +16,6 @@ const request = async <T>(endpoint: string, options?: RequestInit): Promise<T> =
     try {
       errorData = await response.json();
     } catch (e) {
-      // If response is not JSON, use status text
       throw new Error(response.statusText || 'Network response was not ok');
     }
     throw new Error(errorData?.message || response.statusText || 'Network response was not ok');
@@ -29,6 +29,10 @@ export const healthCheck = (): Promise<HealthCheckResponse> => {
 
 export const lockScreen = (): Promise<ActionResult> => {
   return request<ActionResult>('/lock', { method: 'POST' });
+};
+
+export const unlockScreen = (): Promise<ActionResult> => {
+  return request<ActionResult>('/unlock', { method: 'POST' });
 };
 
 export const listApps = (): Promise<AppsResponse> => {
@@ -65,4 +69,8 @@ export const openApplication = (payload: OpenAppPayload): Promise<ActionResult> 
     },
     body: JSON.stringify(payload),
   });
+};
+
+export const getScreenLockStatus = (): Promise<ScreenLockStatusResponse> => {
+  return request<ScreenLockStatusResponse>('/screen-status');
 };
