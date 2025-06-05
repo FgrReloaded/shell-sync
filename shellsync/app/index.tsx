@@ -6,10 +6,10 @@ import {
   TextInput,
   Alert,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useSystemData } from './hooks/useSystemData';
-import Section from './components/Section';
 import SystemInfoCard from './components/SystemInfoCard';
 import NetworkInfoCard from './components/NetworkInfoCard';
 import ActionButton from './components/ActionButton';
@@ -66,46 +66,87 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView
-      className="bg-neutral-900 flex-1"
-      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#0ea5e9" colors={['#0ea5e9']} progressBackgroundColor="#27272a" />}
+      className="flex-1"
+      style={{ backgroundColor: 'var(--bg-primary)' }}
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#3b82f6" colors={['#3b82f6']} progressBackgroundColor="#0a0e1a" />}
     >
-      <View className="p-4">
-        <Text className="text-3xl font-bold text-sky-300 text-center my-4 pb-2 border-b border-neutral-700">ShellSync Dashboard</Text>
+      <View className="p-6">
+        {/* Modern Header */}
+        <View className="mb-8 animate-fadeInUp">
+          <Text className="text-4xl font-bold gradient-text-primary text-center mb-2">ShellSync</Text>
+          <Text className="text-lg text-center mb-6" style={{ color: 'var(--text-secondary)' }}>System Control Dashboard</Text>
 
-        <View className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <ActionButton
-            title="Advanced System Controls"
-            onPress={() => router.push('/system-controls')}
-            color="primary"
-            icon={<Text className="text-xl">⚙️</Text>}
-          />
-          <ActionButton
-            title="View Running Apps"
-            onPress={() => router.push('/running-apps')}
-            color="primary"
-            icon={<Text className="text-xl">📱</Text>}
-          />
+          {/* Status Indicator */}
+          <View className="flex-row justify-center items-center mb-6">
+            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: systemInfo ? 'var(--accent-success)' : 'var(--accent-warning)' }} />
+            <Text style={{ color: 'var(--text-muted)' }}>
+              {systemInfo ? 'System Connected' : 'Connecting...'}
+            </Text>
+          </View>
+        </View>
+
+        {/* Navigation Cards */}
+        <View className="mb-8 flex-row gap-4">
+          <View className="flex-1">
+            <TouchableOpacity
+              onPress={() => router.push('/system-controls')}
+              className="card-dashboard p-6 flex-1"
+              activeOpacity={0.8}
+            >
+              <View className="items-center">
+                <Text className="text-3xl mb-3">⚙️</Text>
+                <Text className="text-lg font-semibold text-center" style={{ color: 'var(--text-primary)' }}>System Controls</Text>
+                <Text className="text-sm text-center mt-1" style={{ color: 'var(--text-muted)' }}>Advanced system management</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View className="flex-1">
+            <TouchableOpacity
+              onPress={() => router.push('/running-apps')}
+              className="card-dashboard p-6 flex-1"
+              activeOpacity={0.8}
+            >
+              <View className="items-center">
+                <Text className="text-3xl mb-3">📱</Text>
+                <Text className="text-lg font-semibold text-center" style={{ color: 'var(--text-primary)' }}>Running Apps</Text>
+                <Text className="text-sm text-center mt-1" style={{ color: 'var(--text-muted)' }}>Monitor active processes</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
         </View>
 
         {errorSystemInfo && (
-          <ErrorDisplay
-            message={errorSystemInfo.message || 'Could not load system data.'}
-            onRetry={refreshAll}
-            className="mb-4"
-          />
+          <View className="card-modern p-4 mb-6" style={{ backgroundColor: 'var(--accent-danger)', borderColor: 'var(--accent-danger)' }}>
+            <ErrorDisplay
+              message={errorSystemInfo.message || 'Could not load system data.'}
+              onRetry={refreshAll}
+              className="mb-0"
+            />
+          </View>
         )}
 
-        <View className="flex-col sm:flex-row gap-4 mb-4">
-          <SystemInfoCard cpu={systemInfo.cpu} memory={systemInfo.memory} disk={systemInfo.disk} />
-          <NetworkInfoCard network={systemInfo.network} bootTime={systemInfo.boot_time} timestamp={systemInfo.timestamp} />
-        </View>
+        {systemInfo && (
+          <View className="flex-col sm:flex-row gap-4 mb-8">
+            <SystemInfoCard cpu={systemInfo?.cpu || null} memory={systemInfo?.memory || null} disk={systemInfo?.disk || null} />
+            <NetworkInfoCard network={systemInfo?.network || null} bootTime={systemInfo?.boot_time || null} timestamp={systemInfo?.timestamp || null} />
+          </View>
+        )}
+
         {!systemInfo && !isLoadingSystemInfo && errorSystemInfo && (
-          <Text className="text-neutral-400 text-center p-4 mb-4">Could not load system status. Pull down to retry.</Text>
+          <View className="card-modern p-6 mb-6">
+            <Text className="text-center" style={{ color: 'var(--text-muted)' }}>
+              Could not load system status. Pull down to retry.
+            </Text>
+          </View>
         )}
 
-        <View className="flex-col sm:flex-row gap-4 mb-4">
-          <View className="w-full sm:w-0 sm:flex-1">
-            <Section title="Quick Controls">
+        {/* Action Controls Grid */}
+        <View className="flex-col sm:flex-row gap-6 mb-8">
+          <View className="flex-1">
+            <View className="card-dashboard p-6">
+              <Text className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Quick Actions
+              </Text>
               <ActionButton
                 title="Lock Screen"
                 onPress={() => handleAction(lockUserScreen, 'lock', 'Screen locked successfully', 'Failed to lock screen')}
@@ -114,14 +155,24 @@ export default function DashboardScreen() {
                 icon={<Text className="text-xl">🔒</Text>}
                 style={{ width: '100%' }}
               />
-            </Section>
+            </View>
           </View>
-          <View className="w-full sm:w-0 sm:flex-1">
-            <Section title="Open Application">
+
+          <View className="flex-1">
+            <View className="card-dashboard p-6">
+              <Text className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+                Application Launcher
+              </Text>
               <TextInput
-                className="bg-neutral-800 border border-neutral-700 text-neutral-100 text-base rounded-lg p-3 mb-3 w-full focus:border-sky-500 focus:ring-2 focus:ring-sky-600"
+                className="mb-4 p-4 rounded-xl border"
+                style={{
+                  backgroundColor: 'var(--bg-tertiary)',
+                  borderColor: 'var(--border-primary)',
+                  color: 'var(--text-primary)',
+                  fontSize: 16,
+                }}
                 placeholder="Enter application name"
-                placeholderTextColor="#737373"
+                placeholderTextColor="var(--text-muted)"
                 value={appName}
                 onChangeText={setAppName}
                 autoCapitalize="none"
@@ -141,11 +192,11 @@ export default function DashboardScreen() {
                 isLoading={actionStates['openApp']}
                 icon={<Text className="text-xl">🚀</Text>}
               />
-            </Section>
+            </View>
           </View>
         </View>
 
-        <View className="h-10" />
+        <View className="h-16" />
       </View>
     </ScrollView>
   );

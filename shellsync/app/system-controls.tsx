@@ -1,12 +1,14 @@
 import React, { useState, useCallback } from 'react';
-import { View, Text, Alert, ScrollView } from 'react-native';
+import { View, Text, Alert, ScrollView, TouchableOpacity } from 'react-native';
 import { Stack } from 'expo-router';
+import { useRouter } from 'expo-router';
 import ActionButton from './components/ActionButton';
 import * as api from './services/api';
 import { ActionResult } from './types/api';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function SystemControlsScreen() {
+  const router = useRouter();
   const [actionStates, setActionStates] = useState<Record<string, boolean>>({});
   const [screenLockStatus, setScreenLockStatus] = useState<{
     locked?: boolean;
@@ -84,12 +86,41 @@ export default function SystemControlsScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-neutral-900">
-      <Stack.Screen options={{ title: 'System Controls', headerTintColor: '#e5e5e5', headerStyle: { backgroundColor: '#171717' } }} />
-      <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} className="p-6">
-        <Text className="text-3xl font-bold text-sky-400 text-center mb-10">Advanced System Controls</Text>
+    <SafeAreaView className="flex-1" style={{ backgroundColor: 'var(--bg-primary)' }}>
+      <Stack.Screen
+        options={{
+          title: 'System Controls',
+          headerTintColor: 'var(--text-primary)',
+          headerStyle: { backgroundColor: 'var(--bg-secondary)' }
+        }}
+      />
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }}
+        className="p-6"
+      >
+        {/* Header */}
+        <View className="mb-8 animate-fadeInUp">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            className="mb-4 self-start"
+            style={{ opacity: 0.8 }}
+          >
+            <Text style={{ color: 'var(--accent-primary)', fontSize: 16 }}>← Back to Dashboard</Text>
+          </TouchableOpacity>
 
-        <View className="mb-8 p-4 bg-neutral-800 rounded-lg shadow-lg border border-neutral-700">
+          <Text className="text-4xl font-bold gradient-text-primary text-center mb-2">
+            System Controls
+          </Text>
+          <Text className="text-lg text-center" style={{ color: 'var(--text-secondary)' }}>
+            Advanced system management tools
+          </Text>
+        </View>
+
+        {/* Status Check Card */}
+        <View className="card-dashboard p-6 mb-8">
+          <Text className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+            🔍 System Status
+          </Text>
           <ActionButton
             title="Check Screen Lock Status"
             onPress={checkScreenLock}
@@ -98,15 +129,25 @@ export default function SystemControlsScreen() {
             icon={<Text className="text-2xl">❓</Text>}
           />
           {screenLockStatus.checked && (
-            <View className="mt-4">
-              <Text className={`text-lg text-center ${screenLockStatus.error ? 'text-red-400' : 'text-green-400'}`}>
+            <View className="mt-4 p-4 rounded-xl" style={{
+              backgroundColor: screenLockStatus.error ? 'rgba(239, 68, 68, 0.1)' : 'rgba(16, 185, 129, 0.1)',
+              borderColor: screenLockStatus.error ? 'var(--accent-danger)' : 'var(--accent-success)',
+              borderWidth: 1,
+            }}>
+              <Text className="text-lg text-center font-semibold" style={{
+                color: screenLockStatus.error ? 'var(--accent-danger)' : 'var(--accent-success)'
+              }}>
                 {screenLockStatus.message}
               </Text>
             </View>
           )}
         </View>
 
-        <View className="bg-neutral-800 p-4 rounded-lg shadow-lg border border-neutral-700">
+        {/* Control Actions Grid */}
+        <View className="card-dashboard p-6">
+          <Text className="text-xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+            ⚡ System Actions
+          </Text>
           <View className="gap-4">
             <ActionButton
               title="Lock Screen"
@@ -171,6 +212,8 @@ export default function SystemControlsScreen() {
             />
           </View>
         </View>
+
+        <View className="h-16" />
       </ScrollView>
     </SafeAreaView>
   );
