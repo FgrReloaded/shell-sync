@@ -9,7 +9,7 @@ interface SystemInfoCardProps {
 }
 
 const InfoItem: React.FC<{ label: string; value: string | number | undefined | null; unit?: string }> = ({ label, value, unit }) => (
-  <View className="mb-2">
+  <View className="flex-row justify-between items-center mb-2">
     <Text className="text-sm text-neutral-400">{label}</Text>
     <Text className="text-lg font-semibold text-neutral-100">
       {value ?? 'N/A'} {value !== null && value !== undefined && unit}
@@ -19,7 +19,7 @@ const InfoItem: React.FC<{ label: string; value: string | number | undefined | n
 
 const SystemInfoCard: React.FC<SystemInfoCardProps> = ({ cpu, memory, disk }) => {
   return (
-    <View className="bg-neutral-800 p-4 rounded-lg mx-4 mb-4">
+    <View className="bg-neutral-800 p-4 rounded-lg mb-4 shadow-lg border border-neutral-700">
       <Text className="text-xl font-bold text-sky-400 mb-3">System Overview</Text>
 
       {cpu && (

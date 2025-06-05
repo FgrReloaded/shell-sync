@@ -9,7 +9,7 @@ interface AppListItemProps {
 
 const AppListItem: React.FC<AppListItemProps> = ({ app, onKill }) => {
   return (
-    <View className="bg-neutral-800 p-3 rounded-lg mb-3 flex-row justify-between items-center mx-4">
+    <View className="bg-neutral-800 p-3 rounded-lg mb-3 flex-row justify-between items-center shadow-lg border border-neutral-700">
       <View className="flex-1 mr-2">
         <Text className="text-base font-semibold text-neutral-100 truncate" numberOfLines={1}>{app.name}</Text>
         <Text className="text-xs text-neutral-400">PID: {app.pid}</Text>
@@ -20,7 +20,7 @@ const AppListItem: React.FC<AppListItemProps> = ({ app, onKill }) => {
       </View>
       <TouchableOpacity
         onPress={() => onKill(app.pid)}
-        className="bg-red-600 hover:bg-red-700 active:bg-red-800 py-2 px-3 rounded-md shadow-md"
+        className="bg-red-600 hover:bg-red-700 active:bg-red-800 py-2 px-3 rounded-md shadow-lg"
       >
         <Text className="text-white text-xs font-medium">Kill</Text>
       </TouchableOpacity>

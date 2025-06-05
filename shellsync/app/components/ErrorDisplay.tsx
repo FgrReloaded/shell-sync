@@ -11,7 +11,7 @@ const ErrorDisplay: React.FC<ErrorDisplayProps> = ({ message, onRetry, className
   if (!message) return null;
 
   return (
-    <View className={`bg-red-800 border border-red-700 p-4 rounded-lg mx-4 my-2 ${className || ''}`}>
+    <View className={`bg-red-800 border border-red-700 p-4 rounded-lg my-2 shadow-lg ${className || ''}`}>
       <Text className="text-red-100 font-semibold mb-2">Oops! Something went wrong.</Text>
       <Text className="text-red-200 text-sm">{message}</Text>
       {onRetry && (

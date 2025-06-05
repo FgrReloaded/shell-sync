@@ -89,7 +89,7 @@ export default function SystemControlsScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} className="p-6">
         <Text className="text-3xl font-bold text-sky-400 text-center mb-10">Advanced System Controls</Text>
 
-        <View className="mb-8 p-4 bg-neutral-800 rounded-lg">
+        <View className="mb-8 p-4 bg-neutral-800 rounded-lg shadow-lg">
           <ActionButton
             title="Check Screen Lock Status"
             onPress={checkScreenLock}
@@ -106,68 +106,70 @@ export default function SystemControlsScreen() {
           )}
         </View>
 
-        <View className="gap-4">
-          <ActionButton
-            title="Lock Screen"
-            onPress={() =>
-              handleSystemAction(
-                api.lockScreen,
-                'lock',
-                'Lock Screen',
-                'Are you sure you want to lock the screen?',
-                false
-              )
-            }
-            color="secondary"
-            isLoading={actionStates['lock']}
-            icon={<Text className="text-2xl">🔒</Text>}
-          />
+        <View className="bg-neutral-800 p-4 rounded-lg shadow-lg">
+          <View className="gap-4">
+            <ActionButton
+              title="Lock Screen"
+              onPress={() =>
+                handleSystemAction(
+                  api.lockScreen,
+                  'lock',
+                  'Lock Screen',
+                  'Are you sure you want to lock the screen?',
+                  false
+                )
+              }
+              color="secondary"
+              isLoading={actionStates['lock']}
+              icon={<Text className="text-2xl">🔒</Text>}
+            />
 
-          <ActionButton
-            title="Unlock Screen"
-            onPress={() =>
-              handleSystemAction(
-                api.unlockScreen,
-                'unlock',
-                'Unlock Screen',
-                'Are you sure you want to unlock the screen?',
-                false
-              )
-            }
-            color="primary"
-            isLoading={actionStates['unlock']}
-            icon={<Text className="text-2xl">🔓</Text>}
-          />
+            <ActionButton
+              title="Unlock Screen"
+              onPress={() =>
+                handleSystemAction(
+                  api.unlockScreen,
+                  'unlock',
+                  'Unlock Screen',
+                  'Are you sure you want to unlock the screen?',
+                  false
+                )
+              }
+              color="primary"
+              isLoading={actionStates['unlock']}
+              icon={<Text className="text-2xl">🔓</Text>}
+            />
 
-          <ActionButton
-            title="Restart System"
-            onPress={() =>
-              handleSystemAction(
-                api.restartSystem,
-                'restart',
-                'Confirm Restart',
-                'Are you sure you want to restart the system? This action is irreversible.'
-              )
-            }
-            color="warning"
-            isLoading={actionStates['restart']}
-            icon={<Text className="text-2xl">🔄</Text>}
-          />
+            <ActionButton
+              title="Restart System"
+              onPress={() =>
+                handleSystemAction(
+                  api.restartSystem,
+                  'restart',
+                  'Confirm Restart',
+                  'Are you sure you want to restart the system? This action is irreversible.'
+                )
+              }
+              color="warning"
+              isLoading={actionStates['restart']}
+              icon={<Text className="text-2xl">🔄</Text>}
+            />
 
-          <ActionButton
-            title="Shutdown System"
-            onPress={() =>
-              handleSystemAction(
-                api.shutdownSystem,
-                'shutdown',
-                'Confirm Shutdown',
-                'Are you sure you want to shut down the system? This action is irreversible.'
-              )
-            }
-            color="danger"
-            isLoading={actionStates['shutdown']}
-            icon={<Text className="text-2xl">🔌</Text>}
-          />
+            <ActionButton
+              title="Shutdown System"
+              onPress={() =>
+                handleSystemAction(
+                  api.shutdownSystem,
+                  'shutdown',
+                  'Confirm Shutdown',
+                  'Are you sure you want to shut down the system? This action is irreversible.'
+                )
+              }
+              color="danger"
+              isLoading={actionStates['shutdown']}
+              icon={<Text className="text-2xl">🔌</Text>}
+            />
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>

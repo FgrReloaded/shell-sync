@@ -22,7 +22,7 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   isLoading = false,
   icon
 }) => {
-  let baseButtonClass = 'py-3 px-4 rounded-lg shadow-md flex-row items-center justify-center';
+  let baseButtonClass = 'py-3 px-4 rounded-lg shadow-lg flex-row items-center justify-center';
   let baseTextClass = 'font-semibold text-base';
 
   switch (color) {
@@ -31,8 +31,8 @@ const ActionButton: React.FC<ActionButtonProps> = ({
       baseTextClass += ' text-white';
       break;
     case 'secondary':
-      baseButtonClass += ' bg-neutral-600 active:bg-neutral-700';
-      baseTextClass += ' text-neutral-100';
+      baseButtonClass += ' border border-neutral-500 bg-transparent active:bg-neutral-700';
+      baseTextClass += ' text-neutral-100 active:text-white';
       break;
     case 'danger':
       baseButtonClass += ' bg-red-600 active:bg-red-700';
