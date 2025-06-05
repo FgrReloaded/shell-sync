@@ -26,79 +26,84 @@ const ActionButton: React.FC<ActionButtonProps> = ({
   size = 'md',
   variant = 'solid'
 }) => {
-  // Base button styles using CSS variables
+  // Modern button styles matching file manager design
   const getButtonStyle = (): ViewStyle => {
     let buttonStyle: ViewStyle = {
-      borderRadius: 16,
+      borderRadius: 12,
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.3,
+      shadowColor: '#1E293B',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
       shadowRadius: 8,
-      elevation: 8,
+      elevation: 3,
+      borderWidth: 1,
     };
 
     // Size variations
     switch (size) {
       case 'sm':
-        buttonStyle.paddingVertical = 8;
-        buttonStyle.paddingHorizontal = 12;
+        buttonStyle.paddingVertical = 10;
+        buttonStyle.paddingHorizontal = 16;
         break;
       case 'md':
-        buttonStyle.paddingVertical = 14;
+        buttonStyle.paddingVertical = 16;
         buttonStyle.paddingHorizontal = 24;
         break;
       case 'lg':
-        buttonStyle.paddingVertical = 18;
+        buttonStyle.paddingVertical = 20;
         buttonStyle.paddingHorizontal = 32;
         break;
     }
 
-    // Color and variant combinations
+    // Color and variant combinations with modern colors
     if (variant === 'solid') {
       switch (color) {
         case 'primary':
-          buttonStyle.backgroundColor = '#3b82f6';
-          buttonStyle.shadowColor = '#3b82f6';
+          buttonStyle.backgroundColor = '#3B82F6';
+          buttonStyle.borderColor = '#3B82F6';
           break;
         case 'secondary':
-          buttonStyle.backgroundColor = '#8b5cf6';
-          buttonStyle.shadowColor = '#8b5cf6';
+          buttonStyle.backgroundColor = '#64748B';
+          buttonStyle.borderColor = '#64748B';
           break;
         case 'danger':
-          buttonStyle.backgroundColor = '#ef4444';
-          buttonStyle.shadowColor = '#ef4444';
+          buttonStyle.backgroundColor = '#EF4444';
+          buttonStyle.borderColor = '#EF4444';
           break;
         case 'warning':
-          buttonStyle.backgroundColor = '#f59e0b';
-          buttonStyle.shadowColor = '#f59e0b';
+          buttonStyle.backgroundColor = '#F59E0B';
+          buttonStyle.borderColor = '#F59E0B';
           break;
         case 'success':
-          buttonStyle.backgroundColor = '#10b981';
-          buttonStyle.shadowColor = '#10b981';
+          buttonStyle.backgroundColor = '#10B981';
+          buttonStyle.borderColor = '#10B981';
           break;
       }
     } else if (variant === 'outline') {
-      buttonStyle.backgroundColor = 'transparent';
+      buttonStyle.backgroundColor = '#FFFFFF';
       buttonStyle.borderWidth = 2;
       switch (color) {
         case 'primary':
-          buttonStyle.borderColor = '#3b82f6';
+          buttonStyle.borderColor = '#3B82F6';
           break;
         case 'secondary':
-          buttonStyle.borderColor = '#8b5cf6';
+          buttonStyle.borderColor = '#64748B';
           break;
         case 'danger':
-          buttonStyle.borderColor = '#ef4444';
+          buttonStyle.borderColor = '#EF4444';
           break;
         case 'warning':
-          buttonStyle.borderColor = '#f59e0b';
+          buttonStyle.borderColor = '#F59E0B';
           break;
         case 'success':
-          buttonStyle.borderColor = '#10b981';
+          buttonStyle.borderColor = '#10B981';
           break;
       }
+    } else if (variant === 'ghost') {
+      buttonStyle.backgroundColor = '#F8FAFC';
+      buttonStyle.borderColor = '#E2E8F0';
     }
 
     if (disabled || isLoading) {
@@ -126,31 +131,34 @@ const ActionButton: React.FC<ActionButtonProps> = ({
         break;
     }
 
-    // Color variations
+    // Color variations with modern colors
     if (variant === 'solid') {
-      textStyle.color = '#ffffff';
+      textStyle.color = '#FFFFFF';
     } else {
       switch (color) {
         case 'primary':
-          textStyle.color = '#60a5fa';
+          textStyle.color = '#3B82F6';
           break;
         case 'secondary':
-          textStyle.color = '#c084fc';
+          textStyle.color = '#64748B';
           break;
         case 'danger':
-          textStyle.color = '#f87171';
+          textStyle.color = '#EF4444';
           break;
         case 'warning':
-          textStyle.color = '#fbbf24';
+          textStyle.color = '#F59E0B';
           break;
         case 'success':
-          textStyle.color = '#34d399';
+          textStyle.color = '#10B981';
           break;
       }
     }
 
+    if (variant === 'ghost') {
+      textStyle.color = '#475569';
+    }
     return textStyle;
-  };
+  }
 
   const getLoadingColor = () => {
     if (variant === 'solid') return 'white';
@@ -192,6 +200,6 @@ const ActionButton: React.FC<ActionButtonProps> = ({
       )}
     </TouchableOpacity>
   );
-};
+}
 
 export default ActionButton;

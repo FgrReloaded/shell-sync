@@ -66,57 +66,221 @@ export default function DashboardScreen() {
 
   return (
     <ScrollView
-      className="flex-1"
-      style={{ backgroundColor: 'var(--bg-primary)' }}
-      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#3b82f6" colors={['#3b82f6']} progressBackgroundColor="#0a0e1a" />}
+      style={{ flex: 1, backgroundColor: '#F8FAFC' }}
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#3B82F6" colors={['#3B82F6']} />}
+      showsVerticalScrollIndicator={false}
     >
-      <View className="p-6">
-        {/* Modern Header */}
-        <View className="mb-8 animate-fadeInUp">
-          <Text className="text-4xl font-bold gradient-text-primary text-center mb-2">ShellSync</Text>
-          <Text className="text-lg text-center mb-6" style={{ color: 'var(--text-secondary)' }}>System Control Dashboard</Text>
+      <View style={{ padding: 24 }}>
+        <View style={{ marginBottom: 32, alignItems: 'center' }}>
+          <Text style={{
+            fontSize: 36,
+            fontWeight: '800',
+            color: '#1E293B',
+            textAlign: 'center',
+            marginBottom: 8,
+            letterSpacing: -1
+          }}>
+            ShellSync
+          </Text>
+          <Text style={{
+            fontSize: 18,
+            color: '#64748B',
+            textAlign: 'center',
+            fontWeight: '500',
+            marginBottom: 24
+          }}>
+            System Control Dashboard
+          </Text>
 
-          {/* Status Indicator */}
-          <View className="flex-row justify-center items-center mb-6">
-            <View className="w-3 h-3 rounded-full mr-2" style={{ backgroundColor: systemInfo ? 'var(--accent-success)' : 'var(--accent-warning)' }} />
-            <Text style={{ color: 'var(--text-muted)' }}>
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#FFFFFF',
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: '#E2E8F0'
+          }}>
+            <View style={{
+              width: 12,
+              height: 12,
+              borderRadius: 6,
+              marginRight: 8,
+              backgroundColor: systemInfo ? '#10B981' : '#F59E0B'
+            }} />
+            <Text style={{
+              color: '#475569',
+              fontSize: 16,
+              fontWeight: '500'
+            }}>
               {systemInfo ? 'System Connected' : 'Connecting...'}
             </Text>
           </View>
         </View>
 
-        {/* Navigation Cards */}
-        <View className="mb-8 flex-row gap-4">
-          <View className="flex-1">
+        <View style={{ marginBottom: 32, flexDirection: 'row', flexWrap: 'wrap', gap: 16 }}>
+          <View style={{ flex: 1, minWidth: 160 }}>
             <TouchableOpacity
               onPress={() => router.push('/system-controls')}
-              className="card-dashboard p-6 flex-1"
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: 16,
+                padding: 24,
+                borderWidth: 1,
+                borderColor: '#E2E8F0',
+                shadowColor: '#1E293B',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 3,
+              }}
               activeOpacity={0.8}
             >
-              <View className="items-center">
-                <Text className="text-3xl mb-3">⚙️</Text>
-                <Text className="text-lg font-semibold text-center" style={{ color: 'var(--text-primary)' }}>System Controls</Text>
-                <Text className="text-sm text-center mt-1" style={{ color: 'var(--text-muted)' }}>Advanced system management</Text>
+              <View style={{ alignItems: 'center' }}>
+                <View style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 16,
+                  backgroundColor: '#F1F5F9',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 16
+                }}>
+                  <Text style={{ fontSize: 24 }}>⚙️</Text>
+                </View>
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  color: '#1E293B',
+                  marginBottom: 8,
+                  letterSpacing: -0.3
+                }}>
+                  System Controls
+                </Text>
+                <Text style={{
+                  fontSize: 14,
+                  textAlign: 'center',
+                  color: '#64748B',
+                  lineHeight: 20
+                }}>
+                  Advanced system management
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
-          <View className="flex-1">
+          <View style={{ flex: 1, minWidth: 160 }}>
             <TouchableOpacity
               onPress={() => router.push('/running-apps')}
-              className="card-dashboard p-6 flex-1"
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: 16,
+                padding: 24,
+                borderWidth: 1,
+                borderColor: '#E2E8F0',
+                shadowColor: '#1E293B',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 3,
+              }}
               activeOpacity={0.8}
             >
-              <View className="items-center">
-                <Text className="text-3xl mb-3">📱</Text>
-                <Text className="text-lg font-semibold text-center" style={{ color: 'var(--text-primary)' }}>Running Apps</Text>
-                <Text className="text-sm text-center mt-1" style={{ color: 'var(--text-muted)' }}>Monitor active processes</Text>
+              <View style={{ alignItems: 'center' }}>
+                <View style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 16,
+                  backgroundColor: '#F1F5F9',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 16
+                }}>
+                  <Text style={{ fontSize: 24 }}>📱</Text>
+                </View>
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  color: '#1E293B',
+                  marginBottom: 8,
+                  letterSpacing: -0.3
+                }}>
+                  Running Apps
+                </Text>
+                <Text style={{
+                  fontSize: 14,
+                  textAlign: 'center',
+                  color: '#64748B',
+                  lineHeight: 20
+                }}>
+                  Monitor active processes
+                </Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+          <View style={{ flex: 1, minWidth: 160 }}>
+            <TouchableOpacity
+              onPress={() => router.push('/file-manager')}
+              style={{
+                backgroundColor: '#FFFFFF',
+                borderRadius: 16,
+                padding: 24,
+                borderWidth: 1,
+                borderColor: '#E2E8F0',
+                shadowColor: '#1E293B',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 3,
+              }}
+              activeOpacity={0.8}
+            >
+              <View style={{ alignItems: 'center' }}>
+                <View style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: 16,
+                  backgroundColor: '#F1F5F9',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 16
+                }}>
+                  <Text style={{ fontSize: 24 }}>📁</Text>
+                </View>
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: '700',
+                  textAlign: 'center',
+                  color: '#1E293B',
+                  marginBottom: 8,
+                  letterSpacing: -0.3
+                }}>
+                  File Manager
+                </Text>
+                <Text style={{
+                  fontSize: 14,
+                  textAlign: 'center',
+                  color: '#64748B',
+                  lineHeight: 20
+                }}>
+                  Browse and manage files
+                </Text>
               </View>
             </TouchableOpacity>
           </View>
         </View>
 
         {errorSystemInfo && (
-          <View className="card-modern p-4 mb-6" style={{ backgroundColor: 'var(--accent-danger)', borderColor: 'var(--accent-danger)' }}>
+          <View style={{
+            backgroundColor: '#FEF2F2',
+            borderRadius: 16,
+            padding: 20,
+            marginBottom: 24,
+            borderWidth: 1,
+            borderColor: '#FECACA'
+          }}>
             <ErrorDisplay
               message={errorSystemInfo.message || 'Could not load system data.'}
               onRetry={refreshAll}
@@ -126,25 +290,58 @@ export default function DashboardScreen() {
         )}
 
         {systemInfo && (
-          <View className="flex-col sm:flex-row gap-4 mb-8">
-            <SystemInfoCard cpu={systemInfo?.cpu || null} memory={systemInfo?.memory || null} disk={systemInfo?.disk || null} />
-            <NetworkInfoCard network={systemInfo?.network || null} bootTime={systemInfo?.boot_time || null} timestamp={systemInfo?.timestamp || null} />
+          <View style={{ flexDirection: 'row', gap: 16, marginBottom: 32, flexWrap: 'wrap' }}>
+            <View style={{ flex: 1, minWidth: 300 }}>
+              <SystemInfoCard cpu={systemInfo?.cpu || null} memory={systemInfo?.memory || null} disk={systemInfo?.disk || null} />
+            </View>
+            <View style={{ flex: 1, minWidth: 300 }}>
+              <NetworkInfoCard network={systemInfo?.network || null} bootTime={systemInfo?.boot_time || null} timestamp={systemInfo?.timestamp || null} />
+            </View>
           </View>
         )}
 
         {!systemInfo && !isLoadingSystemInfo && errorSystemInfo && (
-          <View className="card-modern p-6 mb-6">
-            <Text className="text-center" style={{ color: 'var(--text-muted)' }}>
+          <View style={{
+            backgroundColor: '#FFFFFF',
+            borderRadius: 16,
+            padding: 24,
+            marginBottom: 24,
+            borderWidth: 1,
+            borderColor: '#E2E8F0',
+            alignItems: 'center'
+          }}>
+            <Text style={{
+              textAlign: 'center',
+              color: '#64748B',
+              fontSize: 16,
+              fontWeight: '500'
+            }}>
               Could not load system status. Pull down to retry.
             </Text>
           </View>
         )}
 
-        {/* Action Controls Grid */}
-        <View className="flex-col sm:flex-row gap-6 mb-8">
-          <View className="flex-1">
-            <View className="card-dashboard p-6">
-              <Text className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+        <View style={{ flexDirection: 'row', gap: 16, marginBottom: 32, flexWrap: 'wrap' }}>
+          <View style={{ flex: 1, minWidth: 300 }}>
+            <View style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 16,
+              padding: 24,
+              borderWidth: 1,
+              borderColor: '#E2E8F0',
+              shadowColor: '#1E293B',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 3,
+            }}>
+              <Text style={{
+                fontSize: 20,
+                fontWeight: '700',
+                marginBottom: 20,
+                color: '#1E293B',
+                letterSpacing: -0.3
+              }}>
                 Quick Actions
               </Text>
               <ActionButton
@@ -152,27 +349,49 @@ export default function DashboardScreen() {
                 onPress={() => handleAction(lockUserScreen, 'lock', 'Screen locked successfully', 'Failed to lock screen')}
                 color="secondary"
                 isLoading={actionStates['lock']}
-                icon={<Text className="text-xl">🔒</Text>}
+                icon={<Text style={{ fontSize: 18 }}>🔒</Text>}
                 style={{ width: '100%' }}
               />
             </View>
           </View>
 
-          <View className="flex-1">
-            <View className="card-dashboard p-6">
-              <Text className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+          <View style={{ flex: 1, minWidth: 300 }}>
+            <View style={{
+              backgroundColor: '#FFFFFF',
+              borderRadius: 16,
+              padding: 24,
+              borderWidth: 1,
+              borderColor: '#E2E8F0',
+              shadowColor: '#1E293B',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 3,
+            }}>
+              <Text style={{
+                fontSize: 20,
+                fontWeight: '700',
+                marginBottom: 20,
+                color: '#1E293B',
+                letterSpacing: -0.3
+              }}>
                 Application Launcher
               </Text>
               <TextInput
-                className="mb-4 p-4 rounded-xl border"
                 style={{
-                  backgroundColor: 'var(--bg-tertiary)',
-                  borderColor: 'var(--border-primary)',
-                  color: 'var(--text-primary)',
+                  marginBottom: 16,
+                  paddingHorizontal: 16,
+                  paddingVertical: 16,
+                  borderRadius: 12,
+                  borderWidth: 2,
+                  borderColor: appName.trim() ? '#3B82F6' : '#E2E8F0',
+                  backgroundColor: '#F8FAFC',
+                  color: '#1E293B',
                   fontSize: 16,
+                  fontWeight: '500',
                 }}
                 placeholder="Enter application name"
-                placeholderTextColor="var(--text-muted)"
+                placeholderTextColor="#94A3B8"
                 value={appName}
                 onChangeText={setAppName}
                 autoCapitalize="none"
@@ -190,13 +409,13 @@ export default function DashboardScreen() {
                 color="primary"
                 disabled={!appName.trim()}
                 isLoading={actionStates['openApp']}
-                icon={<Text className="text-xl">🚀</Text>}
+                icon={<Text style={{ fontSize: 18 }}>🚀</Text>}
               />
             </View>
           </View>
         </View>
 
-        <View className="h-16" />
+        <View style={{ height: 32 }} />
       </View>
     </ScrollView>
   );

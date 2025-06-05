@@ -9,9 +9,9 @@ interface SystemInfoCardProps {
 }
 
 const InfoItem: React.FC<{ label: string; value: string | number | undefined | null; unit?: string }> = ({ label, value, unit }) => (
-  <View className="flex-row justify-between items-center mb-3">
-    <Text className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>{label}</Text>
-    <Text className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
+  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
+    <Text style={{ fontSize: 14, fontWeight: '500', color: '#64748B' }}>{label}</Text>
+    <Text style={{ fontSize: 16, fontWeight: '700', color: '#1E293B' }}>
       {value ?? 'N/A'} {value !== null && value !== undefined && unit}
     </Text>
   </View>
@@ -21,17 +21,29 @@ const ProgressBar: React.FC<{ percentage: number | null; color: string }> = ({ p
   if (percentage === null || percentage === undefined) return null;
 
   return (
-    <View className="mt-2 mb-3">
-      <View className="h-2 rounded-full overflow-hidden" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+    <View style={{ marginTop: 8, marginBottom: 12 }}>
+      <View style={{
+        height: 8,
+        borderRadius: 4,
+        backgroundColor: '#F1F5F9',
+        overflow: 'hidden'
+      }}>
         <View
-          className="h-full rounded-full transition-all duration-300"
           style={{
+            height: '100%',
+            borderRadius: 4,
             width: `${Math.min(percentage, 100)}%`,
-            backgroundColor: percentage > 80 ? 'var(--accent-danger)' : percentage > 60 ? 'var(--accent-warning)' : color
+            backgroundColor: percentage > 80 ? '#EF4444' : percentage > 60 ? '#F59E0B' : color
           }}
         />
       </View>
-      <Text className="text-xs text-right mt-1" style={{ color: 'var(--text-muted)' }}>
+      <Text style={{
+        fontSize: 12,
+        textAlign: 'right',
+        marginTop: 4,
+        color: '#94A3B8',
+        fontWeight: '500'
+      }}>
         {percentage.toFixed(1)}%
       </Text>
     </View>
@@ -40,29 +52,49 @@ const ProgressBar: React.FC<{ percentage: number | null; color: string }> = ({ p
 
 const SystemInfoCard: React.FC<SystemInfoCardProps> = ({ cpu, memory, disk }) => {
   return (
-    <View className="flex-1 card-dashboard p-6 mb-4">
-      <View className="pb-3 mb-4">
-        <Text className="text-2xl font-bold gradient-text-primary">System Overview</Text>
-        <Text className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>Real-time system metrics</Text>
+    <View style={{
+      backgroundColor: '#FFFFFF',
+      borderRadius: 16,
+      padding: 24,
+      marginBottom: 16,
+      borderWidth: 1,
+      borderColor: '#E2E8F0',
+      shadowColor: '#1E293B',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.1,
+      shadowRadius: 8,
+      elevation: 3,
+    }}>
+      <View style={{ paddingBottom: 12, marginBottom: 16, borderBottomWidth: 1, borderBottomColor: '#F1F5F9' }}>
+        <Text style={{
+          fontSize: 24,
+          fontWeight: '800',
+          color: '#1E293B',
+          letterSpacing: -0.5,
+          marginBottom: 4
+        }}>
+          System Overview
+        </Text>
+        <Text style={{ fontSize: 14, color: '#64748B', fontWeight: '500' }}>Real-time system metrics</Text>
       </View>
 
       {cpu && (
-        <View className="mb-6">
-          <View className="flex-row items-center mb-2">
-            <Text className="text-lg font-bold mr-2" style={{ color: 'var(--text-primary)' }}>🖥️ CPU</Text>
+        <View style={{ marginBottom: 24 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', marginRight: 8, color: '#1E293B' }}>🖥️ CPU</Text>
           </View>
-          <ProgressBar percentage={cpu.usage_percent} color="var(--accent-primary)" />
+          <ProgressBar percentage={cpu.usage_percent} color="#3B82F6" />
           <InfoItem label="Cores" value={cpu.count} />
           {cpu.frequency && <InfoItem label="Frequency" value={cpu.frequency} unit="MHz" />}
         </View>
       )}
 
       {memory && (
-        <View className="mb-6">
-          <View className="flex-row items-center mb-2">
-            <Text className="text-lg font-bold mr-2" style={{ color: 'var(--text-primary)' }}>💾 Memory</Text>
+        <View style={{ marginBottom: 24 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', marginRight: 8, color: '#1E293B' }}>💾 Memory</Text>
           </View>
-          <ProgressBar percentage={memory.percent} color="var(--accent-secondary)" />
+          <ProgressBar percentage={memory.percent} color="#10B981" />
           <InfoItem label="Used" value={memory.used} unit="GB" />
           <InfoItem label="Available" value={memory.available} unit="GB" />
           <InfoItem label="Total" value={memory.total} unit="GB" />
@@ -71,10 +103,10 @@ const SystemInfoCard: React.FC<SystemInfoCardProps> = ({ cpu, memory, disk }) =>
 
       {disk && (
         <View>
-          <View className="flex-row items-center mb-2">
-            <Text className="text-lg font-bold mr-2" style={{ color: 'var(--text-primary)' }}>💿 Storage</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 8 }}>
+            <Text style={{ fontSize: 18, fontWeight: '700', marginRight: 8, color: '#1E293B' }}>💿 Storage</Text>
           </View>
-          <ProgressBar percentage={disk.percent} color="var(--accent-tertiary)" />
+          <ProgressBar percentage={disk.percent} color="#8B5CF6" />
           <InfoItem label="Used" value={disk.used} unit="GB" />
           <InfoItem label="Free" value={disk.free} unit="GB" />
           <InfoItem label="Total" value={disk.total} unit="GB" />
