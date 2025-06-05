@@ -39,8 +39,10 @@ const formatDate = (dateString: string | null | undefined): string => {
 
 const NetworkInfoCard: React.FC<NetworkInfoCardProps> = ({ network, bootTime, timestamp }) => {
   return (
-    <View className="bg-neutral-800 p-4 rounded-lg mb-4 shadow-lg border border-neutral-700">
-      <Text className="text-xl font-bold text-teal-400 mb-3">Connectivity & Status</Text>
+    <View className="flex-1 bg-neutral-800 p-4 rounded-lg mb-4 shadow-lg border border-neutral-700">
+      <View className="pb-2 mb-3 border-b border-neutral-700">
+        <Text className="text-xl font-bold text-neutral-100">Connectivity & Status</Text>
+      </View>
       {network && (
         <View className="mb-3">
           <Text className="text-lg font-semibold text-neutral-200 mb-1">Network Traffic</Text>

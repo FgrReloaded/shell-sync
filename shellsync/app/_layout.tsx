@@ -5,7 +5,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function RootLayout() {
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-neutral-900">
+    <SafeAreaView style={{ flex: 1 }} className="bg-neutral-900 text-neutral-100">
       <Stack screenOptions={{ headerShown: false }} />
       <StatusBar style="light" />
     </SafeAreaView>

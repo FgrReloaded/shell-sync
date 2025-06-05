@@ -89,7 +89,7 @@ export default function SystemControlsScreen() {
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} className="p-6">
         <Text className="text-3xl font-bold text-sky-400 text-center mb-10">Advanced System Controls</Text>
 
-        <View className="mb-8 p-4 bg-neutral-800 rounded-lg shadow-lg">
+        <View className="mb-8 p-4 bg-neutral-800 rounded-lg shadow-lg border border-neutral-700">
           <ActionButton
             title="Check Screen Lock Status"
             onPress={checkScreenLock}
@@ -106,7 +106,7 @@ export default function SystemControlsScreen() {
           )}
         </View>
 
-        <View className="bg-neutral-800 p-4 rounded-lg shadow-lg">
+        <View className="bg-neutral-800 p-4 rounded-lg shadow-lg border border-neutral-700">
           <View className="gap-4">
             <ActionButton
               title="Lock Screen"

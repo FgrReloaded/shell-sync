@@ -4,7 +4,6 @@ import {
   View,
   Text,
   TextInput,
-  FlatList,
   Alert,
   RefreshControl,
 } from 'react-native';
@@ -13,23 +12,18 @@ import { useSystemData } from './hooks/useSystemData';
 import Section from './components/Section';
 import SystemInfoCard from './components/SystemInfoCard';
 import NetworkInfoCard from './components/NetworkInfoCard';
-import AppListItem from './components/AppListItem';
 import ActionButton from './components/ActionButton';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorDisplay from './components/ErrorDisplay';
-import { AppInfo, ActionResult } from './types/api';
+import { ActionResult } from './types/api';
 
 export default function DashboardScreen() {
   const router = useRouter();
   const {
     systemInfo,
-    apps,
     isLoadingSystemInfo,
-    isLoadingApps,
     errorSystemInfo,
-    errorApps,
     refreshAll,
-    killApp,
     openApp,
     lockUserScreen,
   } = useSystemData();
@@ -42,21 +36,16 @@ export default function DashboardScreen() {
     actionFn: () => Promise<ActionResult>,
     actionName: string,
     successMessage?: string,
-    errorMessagePrefix?: string,
-    requiresConfirmation: boolean = false
+    errorMessagePrefix?: string
   ) => {
     setActionStates(prev => ({ ...prev, [actionName]: true }));
     try {
-      if (requiresConfirmation) {
-        // Simplified: confirmation for actions on this screen can be direct if ever needed
-        // For now, only lock screen uses this on index.tsx, which doesn't need confirmation here
-      }
       const result = await actionFn();
       Alert.alert(
         result.success ? 'Success' : 'Error',
         result.message || (result.success ? (successMessage || 'Action completed.') : (errorMessagePrefix || 'Action failed.'))
       );
-      if (result.success && (actionName === 'openApp' || actionName === 'killApp')) {
+      if (result.success && actionName === 'openApp') {
         refreshAll();
       }
     } catch (error: any) {
@@ -71,96 +60,90 @@ export default function DashboardScreen() {
     setIsRefreshing(false);
   }, [refreshAll]);
 
-  if (isLoadingSystemInfo && isLoadingApps && !systemInfo && apps.length === 0) {
+  if (isLoadingSystemInfo && !systemInfo && !errorSystemInfo) {
     return <LoadingSpinner text="Fetching system data..." />;
   }
-
-  const renderAppItem = ({ item }: { item: AppInfo }) => (
-    <AppListItem app={item} onKill={(pid: number) => handleAction(() => killApp(pid), 'killApp', `Process ${pid} terminated.`, `Failed to kill ${pid}`)} />
-  );
 
   return (
     <ScrollView
       className="bg-neutral-900 flex-1"
-      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#0ea5e9" />}
+      refreshControl={<RefreshControl refreshing={isRefreshing} onRefresh={onRefresh} tintColor="#0ea5e9" colors={['#0ea5e9']} progressBackgroundColor="#27272a" />}
     >
       <View className="p-4">
-        <Text className="text-4xl font-bold text-sky-400 text-center my-6">ShellSync</Text>
+        <Text className="text-3xl font-bold text-sky-300 text-center my-4 pb-2 border-b border-neutral-700">ShellSync Dashboard</Text>
 
-        <View className="mb-6">
+        <View className="mb-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
           <ActionButton
             title="Advanced System Controls"
-            onPress={() => router.push('/system-controls' as any)}
+            onPress={() => router.push('/system-controls')}
             color="primary"
             icon={<Text className="text-xl">⚙️</Text>}
           />
+          <ActionButton
+            title="View Running Apps"
+            onPress={() => router.push('/running-apps')}
+            color="primary"
+            icon={<Text className="text-xl">📱</Text>}
+          />
         </View>
 
-        {(errorSystemInfo || errorApps) && (
+        {errorSystemInfo && (
           <ErrorDisplay
-            message={errorSystemInfo?.message || errorApps?.message || 'Could not load some data.'}
+            message={errorSystemInfo.message || 'Could not load system data.'}
             onRetry={refreshAll}
+            className="mb-4"
           />
         )}
 
-        <Section title="System Status">
-          {isLoadingSystemInfo && !systemInfo && <LoadingSpinner size="small" text="Loading system info..." className="h-40" />}
-          {systemInfo && (
-            <>
-              <SystemInfoCard cpu={systemInfo.cpu} memory={systemInfo.memory} disk={systemInfo.disk} />
-              <NetworkInfoCard network={systemInfo.network} bootTime={systemInfo.boot_time} timestamp={systemInfo.timestamp} />
-            </>
-          )}
-        </Section>
+        <View className="flex-col sm:flex-row gap-4 mb-4">
+          <SystemInfoCard cpu={systemInfo.cpu} memory={systemInfo.memory} disk={systemInfo.disk} />
+          <NetworkInfoCard network={systemInfo.network} bootTime={systemInfo.boot_time} timestamp={systemInfo.timestamp} />
+        </View>
+        {!systemInfo && !isLoadingSystemInfo && errorSystemInfo && (
+          <Text className="text-neutral-400 text-center p-4 mb-4">Could not load system status. Pull down to retry.</Text>
+        )}
 
-        <Section title="System Controls">
-          <View>
-            <View className="flex-row justify-between mb-3">
-              <ActionButton title="Lock Screen" onPress={() => handleAction(lockUserScreen, 'lock', 'Screen locked successfully', 'Failed to lock screen', false)} color="secondary" style={{ flex: 1, marginRight: 8 }} isLoading={actionStates['lock']} />
-            </View>
+        <View className="flex-col sm:flex-row gap-4 mb-4">
+          <View className="w-full sm:w-0 sm:flex-1">
+            <Section title="Quick Controls">
+              <ActionButton
+                title="Lock Screen"
+                onPress={() => handleAction(lockUserScreen, 'lock', 'Screen locked successfully', 'Failed to lock screen')}
+                color="secondary"
+                isLoading={actionStates['lock']}
+                icon={<Text className="text-xl">🔒</Text>}
+                style={{ width: '100%' }}
+              />
+            </Section>
           </View>
-        </Section>
-
-        <Section title="Open Application">
-          <View className="mb-4">
-            <TextInput
-              className="bg-neutral-800 border border-neutral-700 text-neutral-100 text-base rounded-lg p-3 mb-3 w-full focus:border-sky-500 focus:ring-2 focus:ring-sky-600"
-              placeholder="Enter application name (e.g., code, firefox)"
-              placeholderTextColor="#737373"
-              value={appName}
-              onChangeText={setAppName}
-              autoCapitalize="none"
-            />
-            <ActionButton
-              title="Launch App"
-              onPress={() => {
-                if (!appName.trim()) {
-                  Alert.alert('Input Required', 'Please enter an application name.');
-                  return;
-                }
-                handleAction(() => openApp(appName), 'openApp', `Launching ${appName}...`, `Failed to launch ${appName}`);
-                setAppName('');
-              }}
-              color="primary"
-              disabled={!appName.trim()}
-              isLoading={actionStates['openApp']}
-            />
+          <View className="w-full sm:w-0 sm:flex-1">
+            <Section title="Open Application">
+              <TextInput
+                className="bg-neutral-800 border border-neutral-700 text-neutral-100 text-base rounded-lg p-3 mb-3 w-full focus:border-sky-500 focus:ring-2 focus:ring-sky-600"
+                placeholder="Enter application name"
+                placeholderTextColor="#737373"
+                value={appName}
+                onChangeText={setAppName}
+                autoCapitalize="none"
+              />
+              <ActionButton
+                title="Launch App"
+                onPress={() => {
+                  if (!appName.trim()) {
+                    Alert.alert('Input Required', 'Please enter an application name.');
+                    return;
+                  }
+                  handleAction(() => openApp(appName), 'openApp', `Launching ${appName}...`, `Failed to launch ${appName}`);
+                  setAppName('');
+                }}
+                color="primary"
+                disabled={!appName.trim()}
+                isLoading={actionStates['openApp']}
+                icon={<Text className="text-xl">🚀</Text>}
+              />
+            </Section>
           </View>
-        </Section>
-
-        <Section title="Running Processes">
-          {isLoadingApps && apps.length === 0 && <LoadingSpinner size="small" text="Loading applications..." className="h-40" />}
-          {apps.length > 0 ? (
-            <FlatList
-              data={apps}
-              renderItem={renderAppItem}
-              keyExtractor={(item) => item.pid.toString()}
-              scrollEnabled={false} // ScrollView is the parent
-            />
-          ) : (
-            !isLoadingApps && <Text className="text-neutral-400 text-center">No applications to display or unable to fetch.</Text>
-          )}
-        </Section>
+        </View>
 
         <View className="h-10" />
       </View>

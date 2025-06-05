@@ -19,8 +19,10 @@ const InfoItem: React.FC<{ label: string; value: string | number | undefined | n
 
 const SystemInfoCard: React.FC<SystemInfoCardProps> = ({ cpu, memory, disk }) => {
   return (
-    <View className="bg-neutral-800 p-4 rounded-lg mb-4 shadow-lg border border-neutral-700">
-      <Text className="text-xl font-bold text-sky-400 mb-3">System Overview</Text>
+    <View className="flex-1 bg-neutral-800 p-4 rounded-lg mb-4 shadow-lg border border-neutral-700">
+      <View className="pb-2 mb-3 border-b border-neutral-700">
+        <Text className="text-xl font-bold text-neutral-100">System Overview</Text>
+      </View>
 
       {cpu && (
         <View className="mb-3">
