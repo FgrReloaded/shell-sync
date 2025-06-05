@@ -134,6 +134,7 @@ export default function DashboardScreen() {
                 shadowOpacity: 0.1,
                 shadowRadius: 8,
                 elevation: 3,
+                height: 210
               }}
               activeOpacity={0.8}
             >
@@ -184,6 +185,7 @@ export default function DashboardScreen() {
                 shadowOpacity: 0.1,
                 shadowRadius: 8,
                 elevation: 3,
+                height: 210
               }}
               activeOpacity={0.8}
             >
