@@ -3,7 +3,8 @@ from .actions import (
     lock_screen, list_apps, get_system_info,
     shutdown_system, restart_system, kill_process, open_application,
     get_screen_lock_status,
-    unlock_screen
+    unlock_screen,
+    list_directory, read_file_content, execute_command
 )
 
 main = Blueprint('main', __name__)
@@ -76,3 +77,34 @@ def open_app():
 def screen_status():
     result = get_screen_lock_status()
     return jsonify(result)
+
+@main.route("/files", methods=["GET"])
+def list_files():
+    path = request.args.get('path', '')
+    result = list_directory(path)
+    return jsonify(result)
+
+@main.route("/read-file", methods=["POST"])
+def read_file():
+    data = request.get_json()
+    file_path = data.get('file_path')
+
+    if not file_path:
+        return jsonify({"success": False, "message": "File path is required"}), 400
+
+    result = read_file_content(file_path)
+    return jsonify(result)
+
+@main.route("/execute", methods=["POST"])
+def execute():
+    data = request.get_json()
+    command = data.get('command')
+    working_directory = data.get('working_directory', '')
+
+    if not command:
+        return jsonify({"success": False, "error": "Command is required"}), 400
+
+    result = execute_command(command, working_directory)
+    return jsonify(result)
+
+

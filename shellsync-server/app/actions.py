@@ -3,6 +3,8 @@ import subprocess
 import psutil
 import json
 from datetime import datetime
+import mimetypes
+from pathlib import Path
 
 def lock_screen():
     try:
@@ -139,5 +141,242 @@ def get_screen_lock_status():
         return {"success": False, "message": "gdbus command not found. Is it installed and in PATH?"}
     except Exception as e:
         return {"success": False, "message": f"An unexpected error occurred: {str(e)}"}
+
+def list_directory(path=""):
+    """List files and folders in the specified directory"""
+    try:
+        if not path:
+            path = os.path.expanduser("~")
+
+        path = os.path.abspath(path)
+
+        if not os.path.exists(path) or not os.path.isdir(path):
+            return {"success": False, "message": "Directory not found"}
+
+        files = []
+        folders = []
+
+        try:
+            for item in os.listdir(path):
+                item_path = os.path.join(path, item)
+
+                if item.startswith('.'):
+                    continue
+
+                stat_info = os.stat(item_path)
+                modified_time = datetime.fromtimestamp(stat_info.st_mtime).strftime("%Y-%m-%d")
+
+                if os.path.isdir(item_path):
+                    folders.append({
+                        "id": item,
+                        "name": item,
+                        "type": "folder",
+                        "size": None,
+                        "modified": modified_time,
+                        "icon": "📁",
+                        "path": item_path
+                    })
+                else:
+                    size = stat_info.st_size
+                    size_str = format_file_size(size)
+
+                    icon = get_file_icon(item)
+
+                    files.append({
+                        "id": item,
+                        "name": item,
+                        "type": "file",
+                        "size": size_str,
+                        "modified": modified_time,
+                        "icon": icon,
+                        "path": item_path
+                    })
+
+        except PermissionError:
+            return {"success": False, "message": "Permission denied"}
+
+        folders.sort(key=lambda x: x['name'].lower())
+        files.sort(key=lambda x: x['name'].lower())
+
+        return {
+            "success": True,
+            "path": path,
+            "files": folders + files,
+            "parent_path": os.path.dirname(path) if path != "/" else None
+        }
+
+    except Exception as e:
+        return {"success": False, "message": str(e)}
+
+def read_file_content(file_path):
+    """Read the content of a text file"""
+    try:
+        file_path = os.path.abspath(file_path)
+
+        if not os.path.exists(file_path) or not os.path.isfile(file_path):
+            return {"success": False, "message": "File not found"}
+
+        file_size = os.path.getsize(file_path)
+        if file_size > 1024 * 1024:  # 1MB
+            return {"success": False, "message": "File too large to read"}
+
+        mime_type, _ = mimetypes.guess_type(file_path)
+        if mime_type and not mime_type.startswith('text'):
+            return {"success": False, "message": "File is not a text file"}
+
+        # Try different encodings
+        encodings = ['utf-8', 'latin-1', 'cp1252']
+        content = None
+
+        for encoding in encodings:
+            try:
+                with open(file_path, 'r', encoding=encoding) as f:
+                    content = f.read()
+                break
+            except UnicodeDecodeError:
+                continue
+
+        if content is None:
+            return {"success": False, "message": "Could not decode file content"}
+
+        return {
+            "success": True,
+            "content": content,
+            "size": file_size,
+            "encoding": encoding
+        }
+
+    except Exception as e:
+        return {"success": False, "message": str(e)}
+
+def format_file_size(size_bytes):
+    """Convert bytes to human readable format"""
+    if size_bytes == 0:
+        return "0 B"
+
+    size_names = ["B", "KB", "MB", "GB", "TB"]
+    i = 0
+    while size_bytes >= 1024 and i < len(size_names) - 1:
+        size_bytes /= 1024.0
+        i += 1
+
+    return f"{size_bytes:.1f} {size_names[i]}"
+
+def get_file_icon(filename):
+    """Get appropriate icon for file based on extension"""
+    extension = Path(filename).suffix.lower()
+
+    icon_map = {
+        '.txt': '📝', '.md': '📝', '.rtf': '📝',
+        '.pdf': '📄', '.doc': '📄', '.docx': '📄',
+        '.xls': '📊', '.xlsx': '📊', '.csv': '📊',
+        '.ppt': '📊', '.pptx': '📊',
+        '.jpg': '🖼️', '.jpeg': '🖼️', '.png': '🖼️', '.gif': '🖼️', '.bmp': '🖼️', '.svg': '🖼️',
+        '.mp3': '🎵', '.wav': '🎵', '.flac': '🎵', '.m4a': '🎵',
+        '.mp4': '🎬', '.avi': '🎬', '.mkv': '🎬', '.mov': '🎬', '.wmv': '🎬',
+        '.zip': '🗜️', '.rar': '🗜️', '.7z': '🗜️', '.tar': '🗜️', '.gz': '🗜️',
+        '.py': '🐍', '.js': '📜', '.html': '🌐', '.css': '🎨', '.json': '📋',
+        '.exe': '⚙️', '.app': '⚙️', '.deb': '📦', '.rpm': '📦',
+    }
+
+    return icon_map.get(extension, '📄')
+
+def execute_command(command, working_directory=""):
+    """Execute a terminal command in the specified directory"""
+    try:
+        # Security: Basic command filtering to prevent dangerous operations
+        dangerous_commands = [
+            'rm -rf /', 'sudo rm', 'format', 'fdisk', 'mkfs', 'dd if=', 'chmod 777 /',
+            'chown -R', '> /dev/', 'wget http', 'curl http', 'nc -l', 'python -c',
+            'eval', 'exec', 'system(', '__import__'
+        ]
+
+        command_lower = command.lower()
+        for dangerous in dangerous_commands:
+            if dangerous in command_lower:
+                return {
+                    "success": False,
+                    "error": f"Command '{command}' is not allowed for security reasons"
+                }
+
+        # Set working directory
+        if not working_directory:
+            working_directory = os.path.expanduser("~")
+
+        working_directory = os.path.abspath(working_directory)
+
+        if not os.path.exists(working_directory) or not os.path.isdir(working_directory):
+            return {"success": False, "error": "Working directory not found"}
+
+        # Handle special built-in commands
+        if command.strip() == 'pwd':
+            return {"success": True, "output": working_directory}
+
+        if command.strip().startswith('cd '):
+            new_path = command.strip()[3:].strip()
+            if new_path == '..':
+                new_dir = os.path.dirname(working_directory)
+            elif new_path.startswith('/'):
+                new_dir = new_path
+            else:
+                new_dir = os.path.join(working_directory, new_path)
+
+            new_dir = os.path.abspath(new_dir)
+            if os.path.exists(new_dir) and os.path.isdir(new_dir):
+                return {"success": True, "output": f"Changed directory to: {new_dir}", "new_path": new_dir}
+            else:
+                return {"success": False, "error": f"Directory '{new_path}' not found"}
+
+        if command.strip() == 'help':
+            help_text = """Available commands:
+• ls, dir - List directory contents
+• pwd - Show current directory
+• cd <path> - Change directory
+• cat <file> - Show file contents
+• grep <pattern> <file> - Search in files
+• find <name> - Find files by name
+• ps - Show running processes
+• df -h - Show disk usage
+• free -h - Show memory usage
+• uptime - Show system uptime
+• whoami - Show current user
+• date - Show current date/time
+• clear - Clear terminal (use Clear button)
+
+Note: Some system commands may be restricted for security."""
+            return {"success": True, "output": help_text}
+
+        try:
+            result = subprocess.run(
+                command,
+                shell=True,
+                cwd=working_directory,
+                capture_output=True,
+                text=True,
+                timeout=30,
+                env=dict(os.environ, PWD=working_directory)
+            )
+
+            output = result.stdout.strip()
+            error = result.stderr.strip()
+
+            if result.returncode == 0:
+                return {
+                    "success": True,
+                    "output": output if output else "Command executed successfully"
+                }
+            else:
+                return {
+                    "success": False,
+                    "error": error if error else f"Command failed with exit code {result.returncode}"
+                }
+
+        except subprocess.TimeoutExpired:
+            return {"success": False, "error": "Command timed out (30 seconds limit)"}
+        except Exception as e:
+            return {"success": False, "error": f"Command execution failed: {str(e)}"}
+
+    except Exception as e:
+        return {"success": False, "error": f"Error: {str(e)}"}
 
 

@@ -17,7 +17,6 @@ const InfoItem: React.FC<{ label: string; value: string | number | undefined | n
   </View>
 );
 
-// Helper to format bytes
 const formatBytes = (bytes: number | undefined | null): string => {
   if (bytes === null || bytes === undefined) return 'N/A';
   if (bytes === 0) return '0 Bytes';
@@ -27,7 +26,6 @@ const formatBytes = (bytes: number | undefined | null): string => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 };
 
-// Helper to format date
 const formatDate = (dateString: string | null | undefined): string => {
   if (!dateString) return 'N/A';
   try {
