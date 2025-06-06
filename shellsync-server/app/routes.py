@@ -100,11 +100,12 @@ def execute():
     data = request.get_json()
     command = data.get('command')
     working_directory = data.get('working_directory', '')
+    timeout = data.get('timeout', 30)  # Default 30 seconds, can be customized
 
     if not command:
         return jsonify({"success": False, "error": "Command is required"}), 400
 
-    result = execute_command(command, working_directory)
+    result = execute_command(command, working_directory, timeout)
     return jsonify(result)
 
 

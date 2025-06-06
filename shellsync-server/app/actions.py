@@ -281,7 +281,7 @@ def get_file_icon(filename):
 
     return icon_map.get(extension, '📄')
 
-def execute_command(command, working_directory=""):
+def execute_command(command, working_directory="", timeout=30):
     """Execute a terminal command in the specified directory"""
     try:
         # Security: Basic command filtering to prevent dangerous operations
@@ -343,36 +343,79 @@ def execute_command(command, working_directory=""):
 • date - Show current date/time
 • clear - Clear terminal (use Clear button)
 
-Note: Some system commands may be restricted for security."""
+Note: Some system commands may be restricted for security.
+For long-running commands like 'npm run dev', use Ctrl+C to stop."""
             return {"success": True, "output": help_text}
 
+        # Check for long-running dev commands and adjust timeout
+        dev_commands = ['npm run', 'pnpm run', 'yarn run', 'npm start', 'pnpm start', 'yarn start', 'serve', 'python -m http.server']
+        is_dev_command = any(dev_cmd in command_lower for dev_cmd in dev_commands)
+
+        if is_dev_command:
+            # For dev commands, use a longer timeout but still limit it
+            timeout = 120  # 2 minutes
+
+        # Check if this might be a background service
+        background_indicators = ['run dev', 'run start', 'serve', '-m http.server']
+        is_background_service = any(bg in command_lower for bg in background_indicators)
+
         try:
-            result = subprocess.run(
-                command,
-                shell=True,
-                cwd=working_directory,
-                capture_output=True,
-                text=True,
-                timeout=30,
-                env=dict(os.environ, PWD=working_directory)
-            )
+            # For potentially long-running commands, give a warning
+            if is_background_service:
+                result = subprocess.run(
+                    command,
+                    shell=True,
+                    cwd=working_directory,
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout,
+                    env=dict(os.environ, PWD=working_directory)
+                )
 
-            output = result.stdout.strip()
-            error = result.stderr.strip()
+                # If it returns quickly, it might have failed or started successfully
+                output = result.stdout.strip()
+                error = result.stderr.strip()
 
-            if result.returncode == 0:
-                return {
-                    "success": True,
-                    "output": output if output else "Command executed successfully"
-                }
+                if result.returncode == 0:
+                    if output:
+                        return {"success": True, "output": output}
+                    else:
+                        return {"success": True, "output": f"Command '{command}' started. Check if the service is running in the background."}
+                else:
+                    return {"success": False, "error": error if error else f"Command failed with exit code {result.returncode}"}
             else:
-                return {
-                    "success": False,
-                    "error": error if error else f"Command failed with exit code {result.returncode}"
-                }
+                result = subprocess.run(
+                    command,
+                    shell=True,
+                    cwd=working_directory,
+                    capture_output=True,
+                    text=True,
+                    timeout=timeout,
+                    env=dict(os.environ, PWD=working_directory)
+                )
+
+                output = result.stdout.strip()
+                error = result.stderr.strip()
+
+                if result.returncode == 0:
+                    return {
+                        "success": True,
+                        "output": output if output else "Command executed successfully"
+                    }
+                else:
+                    return {
+                        "success": False,
+                        "error": error if error else f"Command failed with exit code {result.returncode}"
+                    }
 
         except subprocess.TimeoutExpired:
-            return {"success": False, "error": "Command timed out (30 seconds limit)"}
+            if is_dev_command:
+                return {
+                    "success": False,
+                    "error": f"Command timed out after {timeout} seconds. For long-running services like dev servers, consider running them in the background or use a dedicated terminal session."
+                }
+            else:
+                return {"success": False, "error": f"Command timed out ({timeout} seconds limit)"}
         except Exception as e:
             return {"success": False, "error": f"Command execution failed: {str(e)}"}
 
